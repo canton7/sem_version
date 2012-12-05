@@ -23,6 +23,12 @@ class SemVersion
     pat = @patch <=> other.patch
     return pat unless pat == 0
 
+    pre = compare_sep(@pre, other.pre, true)
+    return pre unless pre == 0
+
+    bui = compare_sep(@build, other.build, false)
+    return bui unless bui == 0
+
     0
   end
 
@@ -31,5 +37,32 @@ class SemVersion
     r << "-#{@pre}" if @pre
     r << "+#{@build}" if @build
     r
+  end
+
+  private
+  
+  def compare_sep(ours, theirs, nil_wins)
+    # Both nil? They're equal
+    return 0 if ours.nil? && theirs.nil?
+    # One's nil? The winner is determined by precidence
+    return nil_wins ? -1 : 1 if theirs.nil?
+    return nil_wins ? 1 : -1 if ours.nil?
+
+    our_parts = ours.split('.')
+    their_parts = theirs.split('.')
+
+    our_parts.zip(their_parts) do |a,b|
+      # b can be nil, in which case it loses
+      return 1 if b.nil?
+      # If they're both ints, convert to as such
+      # If one's an int and the other isn't, the string version of the int gets correctly compared
+      a, b = a.to_i, b.to_i if a =~ /^\d+$/ && b =~ /^\d+$/
+
+      comp = a <=> b
+      return comp unless comp == 0
+    end
+
+    # If we got this far, either they're equal (same length) or they won
+    return (our_parts.length == their_parts.length) ? 0 : -1
   end
 end
