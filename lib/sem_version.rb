@@ -1,5 +1,7 @@
 class SemVersion
   include Comparable
+
+  VERSION = '0.1.0'
   SEMVER_REGEX = /^(\d+)\.(\d+)\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?$/
 
   attr_accessor :major, :minor, :patch, :pre, :build
