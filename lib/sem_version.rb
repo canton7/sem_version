@@ -4,7 +4,8 @@ class SemVersion
   VERSION = '0.1.0'
   SEMVER_REGEX = /^(\d+)\.(\d+)\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?$/
 
-  attr_accessor :major, :minor, :patch, :pre, :build
+  attr_reader :major, :minor, :patch, :pre, :build
+  alias_method :prerelease, :pre
 
   def initialize(string)
     @major, @minor, @patch, @pre, @build = self.class.parse(string)
@@ -64,6 +65,37 @@ class SemVersion
       send(comparison, SemVersion.new(version))
     end
   end
+
+  def major=(val)
+    raise ArgumentError, "#{val} is not a valid major version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
+    @major = val
+  end
+
+  def minor=(val)
+    raise ArgumentError, "#{val} is not a valid minor version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
+    @minor = val
+  end
+
+  def patch=(val)
+    raise ArgumentError, "#{val} is not a valid patch version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
+    @patch = val
+  end
+
+  def pre=(val)
+    if !val.is_a?(String) || val !~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
+      raise ArgumentError, "#{val} is not a valid pre-release version (must be a string following http://semver.org constraints)"
+    end
+    @pre = val
+  end
+  alias_method :prerelease=, :pre=
+
+  def build=(val)
+    if !val.is_a?(String) || val !~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
+      raise ArgumentError, "#{val} is not a valid pbuild version (must be a string following http://semver.org constraints)"
+    end
+    @build = val
+  end
+
 
   def to_s
     r = "#{@major}.#{@minor}.#{patch}"

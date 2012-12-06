@@ -12,6 +12,7 @@ describe "SemVersion" do
     it "should correctly identify the pre-release" do 
       v = SemVersion.new('0.1.2-three.4-5')
       v.pre.should == 'three.4-5'
+      v.prerelease.should == 'three.4-5'
     end
 
     it "should correctly identify the build" do 
@@ -159,6 +160,72 @@ describe "SemVersion" do
 
     it "should raise when ::new called with invalid string" do 
       expect{ SemVersion.new('1.2.x') }.to raise_error(ArgumentError)
+    end
+  end
+
+  context "when modifying specific parts of the version" do 
+    it "should modify major correctly" do 
+      v = SemVersion.new('1.2.3')
+      v.major = 2
+      v.major.should == 2
+    end
+
+    it "should complain if major is invalid" do 
+      v = SemVersion.new('1.2.3')
+      expect{ v.major = -1 }.to raise_error(ArgumentError)
+      expect{ v.major = 'a' }.to raise_error(ArgumentError)
+    end
+
+    it "should modify major correctly" do 
+      v = SemVersion.new('1.2.3')
+      v.major = 2
+      v.major.should == 2
+    end
+
+    it "should complain if minor is invalid" do 
+      v = SemVersion.new('1.2.3')
+      expect{ v.minor = -1 }.to raise_error(ArgumentError)
+      expect{ v.minor = 'a' }.to raise_error(ArgumentError)
+    end
+
+    it "should modify patch correctly" do 
+      v = SemVersion.new('1.2.3')
+      v.patch = 2
+      v.patch.should == 2
+    end
+
+    it "should complain if patch is invalid" do 
+      v = SemVersion.new('1.2.3')
+      expect{ v.patch = -1 }.to raise_error(ArgumentError)
+      expect{ v.patch = 'a' }.to raise_error(ArgumentError)
+    end
+
+    it "should modify prerelease correctly" do 
+      v = SemVersion.new('1.2.3-four.5')
+      v.pre = 'five.6'
+      v.pre.should == 'five.6'
+    end
+
+    it "should complain if prerelease is invalid" do 
+      v = SemVersion.new('1.2.3-four.5')
+      expect{ v.pre = 1 }.to raise_error(ArgumentError)
+      expect{ v.pre = 'a.' }.to raise_error(ArgumentError)
+      expect{ v.pre = '.a' }.to raise_error(ArgumentError)
+      expect{ v.pre = 'a.!' }.to raise_error(ArgumentError)
+    end
+
+    it "should modify build correctly" do 
+      v = SemVersion.new('1.2.3-four.5')
+      v.build = 'five.6'
+      v.build.should == 'five.6'
+    end
+
+    it "should complain if build is invalid" do 
+      v = SemVersion.new('1.2.3-four.5')
+      expect{ v.build = 1 }.to raise_error(ArgumentError)
+      expect{ v.build = 'a.' }.to raise_error(ArgumentError)
+      expect{ v.build = '.a' }.to raise_error(ArgumentError)
+      expect{ v.build = 'a.!' }.to raise_error(ArgumentError)
     end
   end
 end
