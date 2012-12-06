@@ -86,18 +86,50 @@ describe "SemVersion" do
       SemVersion.new('1.0.0+a.3.b').should be > SemVersion.new('1.0.0+a.3')
       SemVersion.new('1.0.0+a.3').should be < SemVersion.new('1.0.0+a.3.3')
     end
+
+    it "should pass the semver.org test cases" do 
+      SemVersion.new('1.0.0-alpha').should be < SemVersion.new('1.0.0-alpha.1')
+      SemVersion.new('1.0.0-alpha.1').should be < SemVersion.new('1.0.0-beta.2')
+      SemVersion.new('1.0.0-beta.2').should be < SemVersion.new('1.0.0-beta.11')
+      SemVersion.new('1.0.0-beta.11').should be < SemVersion.new('1.0.0-rc.1')
+      SemVersion.new('1.0.0-rc.1').should be < SemVersion.new('1.0.0-rc.1+build.1')
+      SemVersion.new('1.0.0-rc.1+build.1').should be < SemVersion.new('1.0.0')
+      SemVersion.new('1.0.0').should be < SemVersion.new('1.0.0+0.3.7')
+      SemVersion.new('1.0.0+0.3.7').should be < SemVersion.new('1.3.7+build')
+      SemVersion.new('1.3.7+build').should be < SemVersion.new('1.3.7+build.2.b8f12d7')
+      SemVersion.new('1.3.7+build.2.b8f12d7').should be < SemVersion.new('1.3.7+build.11.e0f985a')
+    end
   end
 
-  it "should pass the semver.org test cases" do 
-    SemVersion.new('1.0.0-alpha').should be < SemVersion.new('1.0.0-alpha.1')
-    SemVersion.new('1.0.0-alpha.1').should be < SemVersion.new('1.0.0-beta.2')
-    SemVersion.new('1.0.0-beta.2').should be < SemVersion.new('1.0.0-beta.11')
-    SemVersion.new('1.0.0-beta.11').should be < SemVersion.new('1.0.0-rc.1')
-    SemVersion.new('1.0.0-rc.1').should be < SemVersion.new('1.0.0-rc.1+build.1')
-    SemVersion.new('1.0.0-rc.1+build.1').should be < SemVersion.new('1.0.0')
-    SemVersion.new('1.0.0').should be < SemVersion.new('1.0.0+0.3.7')
-    SemVersion.new('1.0.0+0.3.7').should be < SemVersion.new('1.3.7+build')
-    SemVersion.new('1.3.7+build').should be < SemVersion.new('1.3.7+build.2.b8f12d7')
-    SemVersion.new('1.3.7+build.2.b8f12d7').should be < SemVersion.new('1.3.7+build.11.e0f985a')
+  context "when satisfying constraints" do
+    it "should correctly satisfy >" do 
+      SemVersion.new('1.0.1').satisfies?('> 1.0.0').should be_true
+      SemVersion.new('1.0.1').satisfies?('> 1.0.1').should be_false
+    end
+
+    it "should correctly satisfy >=" do 
+      SemVersion.new('1.0.1').satisfies?('>= 1.0.0').should be_true
+      SemVersion.new('1.0.1').satisfies?('>= 1.0.1').should be_true
+      SemVersion.new('1.0.1').satisfies?('>= 1.0.2').should be_false
+    end
+
+    it "should correctly satisfy <" do 
+      SemVersion.new('1.0.1').satisfies?('< 1.0.2').should be_true
+      SemVersion.new('1.0.1').satisfies?('< 1.0.1').should be_false
+    end
+
+    it "should correctly satisfy <=" do 
+      SemVersion.new('1.0.1').satisfies?('<= 1.0.2').should be_true
+      SemVersion.new('1.0.1').satisfies?('<= 1.0.1').should be_true
+      SemVersion.new('1.0.1').satisfies?('<= 1.0.0').should be_false
+    end
+
+    it "should correctly satisfy =" do 
+      SemVersion.new('1.0.1').satisfies?('= 1.0.1').should be_true
+      SemVersion.new('1.0.1').satisfies?('1.0.1').should be_true
+      SemVersion.new('1.0.1').satisfies?('= 1.0.2').should be_false
+    end
   end
+
+
 end

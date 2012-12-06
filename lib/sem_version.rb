@@ -32,6 +32,15 @@ class SemVersion
     0
   end
 
+  def satisfies?(constraint)
+    comparison, version = constraint.strip.split(' ', 2)
+    # Allow '1.0.2' as '== 1.0.2'
+    version, comparison = comparison, '==' if version.nil?
+    # Allow '= 1.0.2' as '== 1.0.2'
+    comparison = '==' if comparison == '='
+    send(comparison, SemVersion.new(version))
+  end
+
   def to_s
     r = "#{@major}.#{@minor}.#{patch}"
     r << "-#{@pre}" if @pre
