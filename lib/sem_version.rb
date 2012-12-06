@@ -38,7 +38,23 @@ class SemVersion
     version, comparison = comparison, '==' if version.nil?
     # Allow '= 1.0.2' as '== 1.0.2'
     comparison = '==' if comparison == '='
-    send(comparison, SemVersion.new(version))
+    # Allow pessimistic operator
+    if comparison == '~>'
+      match = version.match(/^(\d+)\.(\d+)\.?(\d*)$/)
+      raise ArgumentError, "Pessimistic constraints must have a version in the form 'x.y' or 'x.y.z'" unless match
+      maj, min, pat = match.captures
+      if pat.empty?
+        lower = "#{maj}.#{min}.0"
+        upper = "#{maj.to_i+1}.0.0"
+      else
+        lower = "#{maj}.#{min}.#{pat}"
+        upper = "#{maj}.#{min.to_i+1}.0"
+      end
+
+      send('>=', SemVersion.new(lower)) && send('<', SemVersion.new(upper)) 
+    else
+      send(comparison, SemVersion.new(version))
+    end
   end
 
   def to_s

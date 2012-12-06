@@ -129,7 +129,18 @@ describe "SemVersion" do
       SemVersion.new('1.0.1').satisfies?('1.0.1').should be_true
       SemVersion.new('1.0.1').satisfies?('= 1.0.2').should be_false
     end
+
+    it "should correctly satisfy ~> x.y" do 
+      SemVersion.new('2.1.9').satisfies?('~> 2.2').should be_false
+      SemVersion.new('2.2.0').satisfies?('~> 2.2').should be_true
+      SemVersion.new('2.9.0').satisfies?('~> 2.2').should be_true
+      SemVersion.new('3.0.0').satisfies?('~> 2.2').should be_false
+    end
+
+    it "should correctly satisfy ~> x.y.z" do 
+      SemVersion.new('2.1.9').satisfies?('~> 2.2.0').should be_false
+      SemVersion.new('2.2.0').satisfies?('~> 2.2.0').should be_true
+      SemVersion.new('2.3.0').satisfies?('~> 2.2.0').should be_false
+    end
   end
-
-
 end
