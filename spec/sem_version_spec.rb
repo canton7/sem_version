@@ -147,7 +147,7 @@ describe "SemVersion" do
   end
 
   context "when given an invalid version" do 
-    it "should allow return correctly from ::valid?" do 
+    it "should return correctly from ::valid?" do 
       SemVersion.valid?('2.1.9').should be_true
       SemVersion.valid?('2.1').should be_false
       SemVersion.valid?('1.2.x').should be_false
