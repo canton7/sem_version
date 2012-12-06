@@ -9,8 +9,14 @@ class SemVersion
   end
 
   def self.parse(string)
-    maj, min, pat, pre, bui = string.match(SEMVER_REGEX).captures
+    match = string.match(SEMVER_REGEX)
+    raise ArgumentError, "Version string #{string} is not valid" unless match
+    maj, min, pat, pre, bui = match.captures
     [maj.to_i, min.to_i, pat.to_i, pre, bui]
+  end
+
+  def self.valid?(string)
+    !!(string =~ SEMVER_REGEX)
   end
 
   def <=>(other)

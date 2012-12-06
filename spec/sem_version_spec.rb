@@ -143,4 +143,22 @@ describe "SemVersion" do
       SemVersion.new('2.3.0').satisfies?('~> 2.2.0').should be_false
     end
   end
+
+  context "when given an invalid version" do 
+    it "should allow return correctly from ::valid?" do 
+      SemVersion.valid?('2.1.9').should be_true
+      SemVersion.valid?('2.1').should be_false
+      SemVersion.valid?('1.2.x').should be_false
+      SemVersion.valid?('2.1.9-a.b').should be_true
+      SemVersion.valid?('2.1.9-a!').should be_false
+      SemVersion.valid?('2.1.9+a.b').should be_true
+      SemVersion.valid?('2.1.9+a!').should be_false
+      SemVersion.valid?('2.1.9-a.b+c.0').should be_true
+      SemVersion.valid?('2.1.9+a.b-c.0').should be_true
+    end
+
+    it "should raise when ::new called with invalid string" do 
+      expect{ SemVersion.new('1.2.x') }.to raise_error(ArgumentError)
+    end
+  end
 end
