@@ -104,12 +104,13 @@ describe "SemVersion" do
 
   context "when satisfying constraints" do
     it "should correctly satisfy >" do 
-      SemVersion.new('1.0.1').satisfies?('> 1.0.0').should be_true
+      SemVersion.new('1.0.1').satisfies?('> 1').should be_true
       SemVersion.new('1.0.1').satisfies?('> 1.0.1').should be_false
+      SemVersion.new('0.9.9').satisfies?('> 1.0').should be_false
     end
 
     it "should correctly satisfy >=" do 
-      SemVersion.new('1.0.1').satisfies?('>= 1.0.0').should be_true
+      SemVersion.new('1.0.1').satisfies?('>= 1').should be_true
       SemVersion.new('1.0.1').satisfies?('>= 1.0.1').should be_true
       SemVersion.new('1.0.1').satisfies?('>= 1.0.2').should be_false
     end
@@ -122,11 +123,11 @@ describe "SemVersion" do
     it "should correctly satisfy <=" do 
       SemVersion.new('1.0.1').satisfies?('<= 1.0.2').should be_true
       SemVersion.new('1.0.1').satisfies?('<= 1.0.1').should be_true
-      SemVersion.new('1.0.1').satisfies?('<= 1.0.0').should be_false
+      SemVersion.new('1.0.1').satisfies?('<= 1').should be_false
     end
 
     it "should correctly satisfy =" do 
-      SemVersion.new('1.0.1').satisfies?('= 1.0.1').should be_true
+      SemVersion.new('1.0.0').satisfies?('= 1.0').should be_true
       SemVersion.new('1.0.1').satisfies?('1.0.1').should be_true
       SemVersion.new('1.0.1').satisfies?('= 1.0.2').should be_false
     end

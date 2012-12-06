@@ -75,12 +75,16 @@ Satisfying constraints
 ----------------------
 
 You can see whether a semantic version satisfies a particular constraint.
-Constraints are in the form `"<comparison> <version>"`, e.g. ">= 1.2.2", "= 1.0.0", or "~> 1.2".
+Constraints are in the form `"<comparison> <version>"`, e.g. ">= 1.2.2", "= 1.3", or "~> 1.2".
 
 When using the pessimistic operation, `~>`, versions may be specified in the form `"x.y"` or `"x.y.z"` (with `"~> x.y"` meaning `">= x.y.0" && "< x+1.0.0"`, and `"~> x.y.z"` meaning `">= x.y.z" && "< x.y+1.0"`).
 
+When using the other operations, versions may be in the form `"x"`, `"x.y"`, or a full semantic version (including pre-release and build).
+In the former two cases, the missing versions out of minor and patch will be filled in with 0's, and the pre-release and build ignored.
+
 ```ruby
-SemVersion.new('1.2.3').satisfies?('=> 1.2.2')       # => true
+SemVersion.new('1.2.3').satisfies?('>= 1.2')         # => true
 SemVersion.new('1.2.3-pre.1').satisfies?('>= 1.2.3') # => false
+SemVersion.new('0.1.0').satisfies?('> 0')            # => true
 SemVersion.new('2.3.0').satisfies?('~> 2.2')         # => true
 ```

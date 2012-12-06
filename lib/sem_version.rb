@@ -2,24 +2,41 @@ class SemVersion
   include Comparable
 
   VERSION = '0.1.0'
-  SEMVER_REGEX = /^(\d+)\.(\d+)\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?$/
+  # Pattern allows min and patch to be skipped. We have to do extra checking if we want them
+  SEMVER_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?)?)?$/
 
   attr_reader :major, :minor, :patch, :pre, :build
   alias_method :prerelease, :pre
 
-  def initialize(string)
-    @major, @minor, @patch, @pre, @build = self.class.parse(string)
+  # Format were raw bits are passed in is undocumented, and not validity checked
+  def initialize(string, *args)
+    if args.empty?
+      @major, @minor, @patch, @pre, @build = self.class.parse(string)
+    else
+      @major, @minor, @patch, @pre, @build = [string, *args]
+    end
   end
 
   def self.parse(string)
     match = string.match(SEMVER_REGEX)
     raise ArgumentError, "Version string #{string} is not valid" unless match
     maj, min, pat, pre, bui = match.captures
+    raise ArgumentError, "Version string #{string} is not valid" if min.empty? || pat.empty?
     [maj.to_i, min.to_i, pat.to_i, pre, bui]
   end
 
+  def self.from_loose_version(string)
+    match = string.match(SEMVER_REGEX)
+    raise ArgumentError, "Version string #{string} is not valid" unless match
+    maj, min, pat, pre, bui = match.captures
+    min = 0 if min.nil? || min.empty?
+    pat = 0 if pat.nil? || pat.empty?
+    new(maj.to_i, min.to_i, pat.to_i, pre, bui)
+  end
+
   def self.valid?(string)
-    !!(string =~ SEMVER_REGEX)
+    matches = string.match(SEMVER_REGEX)
+    matches && !matches[2].nil? && !matches[3].nil?
   end
 
   def <=>(other)
@@ -43,10 +60,6 @@ class SemVersion
 
   def satisfies?(constraint)
     comparison, version = constraint.strip.split(' ', 2)
-    # Allow '1.0.2' as '== 1.0.2'
-    version, comparison = comparison, '==' if version.nil?
-    # Allow '= 1.0.2' as '== 1.0.2'
-    comparison = '==' if comparison == '='
     # Allow pessimistic operator
     if comparison == '~>'
       match = version.match(/^(\d+)\.(\d+)\.?(\d*)$/)
@@ -62,7 +75,14 @@ class SemVersion
 
       send('>=', SemVersion.new(lower)) && send('<', SemVersion.new(upper)) 
     else
-      send(comparison, SemVersion.new(version))
+      # Allow '1.0.2' as '== 1.0.2'
+      version, comparison = comparison, '==' if version.nil?
+      # Allow '= 1.0.2' as '== 1.0.2'
+      comparison = '==' if comparison == '='
+
+      semversion = self.class.from_loose_version(version)
+
+      send(comparison, semversion)
     end
   end
 
