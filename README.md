@@ -25,6 +25,8 @@ v.to_s          # => '1.2.3-pre.4+build.5'
 You can pass any valid semantic version string, as specified by [Semantic Versions](http://semver.org).
 Invalid versions will raise an ArgumentError
 
+You can also use `SemVersion()` as an alias for `SemVersion.new()`.
+
 Validating
 ----------
 

@@ -151,3 +151,7 @@ class SemVersion
     return (our_parts.length == their_parts.length) ? 0 : -1
   end
 end
+
+def SemVersion(*args)
+  SemVersion.new(*args)
+end

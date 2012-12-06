@@ -229,4 +229,8 @@ describe "SemVersion" do
       expect{ v.build = 'a.!' }.to raise_error(ArgumentError)
     end
   end
+
+  it "allows SemVersion() to be used as an alias" do 
+    SemVersion.new('1.2.3') == SemVersion('1.2.3')
+  end
 end
