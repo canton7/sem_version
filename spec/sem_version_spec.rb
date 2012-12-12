@@ -244,4 +244,11 @@ describe "SemVersion" do
     SemVersion.open_constraint?('<= 1.2.3').should be_true
     SemVersion.open_constraint?('~> 1.2.3').should be_true
   end
+
+  it "should correctly split the comparison and version from constraints" do 
+    SemVersion.split_constraint('1.2.3').should == ['=', '1.2.3']
+    SemVersion.split_constraint('= 1.2.3').should == ['=', '1.2.3']
+    SemVersion.split_constraint('== 1.2.3').should == ['=', '1.2.3']
+    SemVersion.split_constraint('> 1.2.3').should == ['>', '1.2.3']
+  end
 end

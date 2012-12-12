@@ -102,3 +102,13 @@ SemVersion.open_constraint?('== 1.2.3')   # => false
 SemVersion.open_constraint?('<= 1.2.3')   # => true
 SemVersion.open_constraint?('~> 1.2.3')   # => true
 ```
+
+It's also possible to split a constraint into its comparison and version.
+The comparsion is normalised to '=' if it's not given, or '=='.
+
+```ruby
+SemVersion.split_constraint('1.2.3')     # => ['=', '1.2.3']
+SemVersion.split_constraint('= 1.2.3')   # => ['=', '1.2.3']
+SemVersion.split_constraint('== 1.2.3')  # => ['=', '1.2.3']
+SemVersion.split_constraint('> 1.2.3')   # => ['>', '1.2.3']
+```
