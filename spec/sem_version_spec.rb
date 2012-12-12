@@ -233,4 +233,15 @@ describe "SemVersion" do
   it "allows SemVersion() to be used as an alias" do 
     SemVersion.new('1.2.3') == SemVersion('1.2.3')
   end
+
+  it "should identify open and closed contraints" do 
+    SemVersion.open_constraint?('1.2.3').should be_false
+    SemVersion.open_constraint?('= 1.2.3').should be_false
+    SemVersion.open_constraint?('== 1.2.3').should be_false
+    SemVersion.open_constraint?('> 1.2.3').should be_true
+    SemVersion.open_constraint?('>= 1.2.3').should be_true
+    SemVersion.open_constraint?('< 1.2.3').should be_true
+    SemVersion.open_constraint?('<= 1.2.3').should be_true
+    SemVersion.open_constraint?('~> 1.2.3').should be_true
+  end
 end
