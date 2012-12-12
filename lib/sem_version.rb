@@ -1,7 +1,7 @@
 class SemVersion
   include Comparable
 
-  VERSION = '1.0.0'
+  VERSION = '1.1.0'
   # Pattern allows min and patch to be skipped. We have to do extra checking if we want them
   SEMVER_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?)?)?$/
 
@@ -86,6 +86,11 @@ class SemVersion
     end
   end
 
+  def self.open_constraint?(constraint)
+    comparison, version = constraint.strip.split(' ', 2)
+    !['=', '=='].include?(comparison) && !version.nil?
+  end
+
   def major=(val)
     raise ArgumentError, "#{val} is not a valid major version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
     @major = val
@@ -150,4 +155,8 @@ class SemVersion
     # If we got this far, either they're equal (same length) or they won
     return (our_parts.length == their_parts.length) ? 0 : -1
   end
+end
+
+def SemVersion(*args)
+  SemVersion.new(*args)
 end

@@ -25,6 +25,8 @@ v.to_s          # => '1.2.3-pre.4+build.5'
 You can pass any valid semantic version string, as specified by [Semantic Versions](http://semver.org).
 Invalid versions will raise an ArgumentError
 
+You can also use `SemVersion()` as an alias for `SemVersion.new()`.
+
 Validating
 ----------
 
@@ -87,4 +89,16 @@ SemVersion.new('1.2.3').satisfies?('>= 1.2')         # => true
 SemVersion.new('1.2.3-pre.1').satisfies?('>= 1.2.3') # => false
 SemVersion.new('0.1.0').satisfies?('> 0')            # => true
 SemVersion.new('2.3.0').satisfies?('~> 2.2')         # => true
+```
+
+You can also see whether a given constraint is 'open' (allows a range of versions), or 'closed' (allows only one version).
+
+For example:
+
+```ruby
+SemVersion.open_constraint?('1.2.3')      # => false
+SemVersion.open_constraint?('= 1.2.3')    # => false
+SemVersion.open_constraint?('== 1.2.3')   # => false
+SemVersion.open_constraint?('<= 1.2.3')   # => true
+SemVersion.open_constraint?('~> 1.2.3')   # => true
 ```

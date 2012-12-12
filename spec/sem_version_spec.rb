@@ -147,7 +147,7 @@ describe "SemVersion" do
   end
 
   context "when given an invalid version" do 
-    it "should allow return correctly from ::valid?" do 
+    it "should return correctly from ::valid?" do 
       SemVersion.valid?('2.1.9').should be_true
       SemVersion.valid?('2.1').should be_false
       SemVersion.valid?('1.2.x').should be_false
@@ -228,5 +228,20 @@ describe "SemVersion" do
       expect{ v.build = '.a' }.to raise_error(ArgumentError)
       expect{ v.build = 'a.!' }.to raise_error(ArgumentError)
     end
+  end
+
+  it "allows SemVersion() to be used as an alias" do 
+    SemVersion.new('1.2.3') == SemVersion('1.2.3')
+  end
+
+  it "should identify open and closed contraints" do 
+    SemVersion.open_constraint?('1.2.3').should be_false
+    SemVersion.open_constraint?('= 1.2.3').should be_false
+    SemVersion.open_constraint?('== 1.2.3').should be_false
+    SemVersion.open_constraint?('> 1.2.3').should be_true
+    SemVersion.open_constraint?('>= 1.2.3').should be_true
+    SemVersion.open_constraint?('< 1.2.3').should be_true
+    SemVersion.open_constraint?('<= 1.2.3').should be_true
+    SemVersion.open_constraint?('~> 1.2.3').should be_true
   end
 end
