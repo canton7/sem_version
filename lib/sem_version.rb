@@ -91,6 +91,13 @@ class SemVersion
     !['=', '=='].include?(comparison) && !version.nil?
   end
 
+  def self.split_constraint(constraint)
+    comparison, version = constraint.strip.split(' ', 2)
+    comparison, version = '=', comparison if version.nil?
+    comparison = '=' if comparison == '=='
+    [comparison, version]
+  end
+
   def major=(val)
     raise ArgumentError, "#{val} is not a valid major version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
     @major = val
