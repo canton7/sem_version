@@ -59,7 +59,7 @@ class SemVersion
   end
 
   def satisfies?(constraint)
-    comparison, version = constraint.strip.split(' ', 2)
+    comparison, version = self.class.split_constraint(constraint)
     # Allow pessimistic operator
     if comparison == '~>'
       match = version.match(/^(\d+)\.(\d+)\.?(\d*)$/)
@@ -75,20 +75,15 @@ class SemVersion
 
       send('>=', SemVersion.new(lower)) && send('<', SemVersion.new(upper)) 
     else
-      # Allow '1.0.2' as '== 1.0.2'
-      version, comparison = comparison, '==' if version.nil?
-      # Allow '= 1.0.2' as '== 1.0.2'
       comparison = '==' if comparison == '='
-
       semversion = self.class.from_loose_version(version)
-
       send(comparison, semversion)
     end
   end
 
   def self.open_constraint?(constraint)
-    comparison, version = constraint.strip.split(' ', 2)
-    !['=', '=='].include?(comparison) && !version.nil?
+    comparison, _ = self.split_constraint(constraint)
+    comparison != '='
   end
 
   def self.split_constraint(constraint)
