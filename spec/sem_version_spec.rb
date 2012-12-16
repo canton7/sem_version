@@ -213,6 +213,8 @@ describe "SemVersion" do
       v = SemVersion.new('1.2.3-four.5')
       v.pre = 'five.6'
       v.pre.should == 'five.6'
+      v.pre = nil
+      v.pre.should == nil
     end
 
     it "should complain if prerelease is invalid" do 
@@ -227,6 +229,8 @@ describe "SemVersion" do
       v = SemVersion.new('1.2.3-four.5')
       v.build = 'five.6'
       v.build.should == 'five.6'
+      v.build = nil
+      v.build.should == nil
     end
 
     it "should complain if build is invalid" do 

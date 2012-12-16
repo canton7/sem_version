@@ -109,16 +109,16 @@ class SemVersion
   end
 
   def pre=(val)
-    if !val.is_a?(String) || val !~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
-      raise ArgumentError, "#{val} is not a valid pre-release version (must be a string following http://semver.org constraints)"
+    unless val.nil? || (val.is_a?(String) && val =~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/)
+      raise ArgumentError, "#{val} is not a valid pre-release version (must be nil, or a string following http://semver.org constraints)"
     end
     @pre = val
   end
   alias_method :prerelease=, :pre=
 
   def build=(val)
-    if !val.is_a?(String) || val !~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
-      raise ArgumentError, "#{val} is not a valid pbuild version (must be a string following http://semver.org constraints)"
+    unless val.nil? || (val.is_a?(String) && val =~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/)
+      raise ArgumentError, "#{val} is not a valid pbuild version (must be nil, or a string following http://semver.org constraints)"
     end
     @build = val
   end
