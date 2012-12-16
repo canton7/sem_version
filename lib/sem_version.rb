@@ -4,16 +4,28 @@ class SemVersion
   VERSION = '1.2.0'
   # Pattern allows min and patch to be skipped. We have to do extra checking if we want them
   SEMVER_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?)?)?$/
+  PRE_BUILD_REGEX = /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
 
   attr_reader :major, :minor, :patch, :pre, :build
   alias_method :prerelease, :pre
 
   # Format were raw bits are passed in is undocumented, and not validity checked
-  def initialize(string, *args)
-    if args.empty?
-      @major, @minor, @patch, @pre, @build = self.class.parse(string)
+  def initialize(*args)
+    if args.first.is_a?(String)
+      @major, @minor, @patch, @pre, @build = self.class.parse(args.first)
+      # Validation should be handled at a string level by self.parse, but validate anyway
+      validate
+    elsif args.first.is_a?(Hash)
+      @major, @minor, @patch, @pre, @build = args.first.values_at(:major, :minor, :patch, :pre, :build)
+      # Allow :prerelease as well
+      @pre ||= args.first[:prerelease]
+      validate
+    elsif args.first.is_a?(Array)
+      @major, @minor, @patch, @pre, @build = *args.first
+      validate
     else
-      @major, @minor, @patch, @pre, @build = [string, *args]
+      @major, @minor, @patch, @pre, @build = *args
+      validate
     end
   end
 
@@ -73,7 +85,7 @@ class SemVersion
         upper = "#{maj}.#{min.to_i+1}.0"
       end
 
-      send('>=', SemVersion.new(lower)) && send('<', SemVersion.new(upper)) 
+      send('>=', SemVersion.new(lower)) && send('<', SemVersion.new(upper))
     else
       comparison = '==' if comparison == '='
       semversion = self.class.from_loose_version(version)
@@ -109,7 +121,7 @@ class SemVersion
   end
 
   def pre=(val)
-    unless val.nil? || (val.is_a?(String) && val =~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/)
+    unless val.nil? || (val.is_a?(String) && val =~ PRE_BUILD_REGEX)
       raise ArgumentError, "#{val} is not a valid pre-release version (must be nil, or a string following http://semver.org constraints)"
     end
     @pre = val
@@ -117,8 +129,8 @@ class SemVersion
   alias_method :prerelease=, :pre=
 
   def build=(val)
-    unless val.nil? || (val.is_a?(String) && val =~ /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/)
-      raise ArgumentError, "#{val} is not a valid pbuild version (must be nil, or a string following http://semver.org constraints)"
+    unless val.nil? || (val.is_a?(String) && val =~ PRE_BUILD_REGEX)
+      raise ArgumentError, "#{val} is not a valid build version (must be nil, or a string following http://semver.org constraints)"
     end
     @build = val
   end
@@ -135,11 +147,12 @@ class SemVersion
   end
 
   def to_h
-    Hash[[:major, :minor, :patch, :pre, :build].zip(to_a)]
+    h = [:major, :minor, :patch, :pre, :build].zip(to_a)
+    Hash[h.reject{ |k,v| v.nil? }]
   end
 
   private
-  
+
   def compare_sep(ours, theirs, nil_wins)
     # Both nil? They're equal
     return 0 if ours.nil? && theirs.nil?
@@ -163,6 +176,19 @@ class SemVersion
 
     # If we got this far, either they're equal (same length) or they won
     return (our_parts.length == their_parts.length) ? 0 : -1
+  end
+
+  def validate
+    # Validates the instance variables. Different approach to validating a raw string
+    raise ArgumentError, "Invalid version (major is not an int >= 0)" unless @major.is_a?(Fixnum) && @major >= 0
+    raise ArgumentError, "Invalid version (minor is not an int >= 0)" unless @minor.is_a?(Fixnum) && @minor >= 0
+    raise ArgumentError, "Invalid version (patch is not an int >= 0)" unless @patch.is_a?(Fixnum) && @patch >= 0
+    unless @pre.nil? || (@pre.is_a?(String) && @pre =~ PRE_BUILD_REGEX)
+      raise ArgumentError, "Invalid version (pre must be nil, or a string following http://semver.org contraints)"
+    end
+    unless @build.nil? || (@build.is_a?(String) && @build =~ PRE_BUILD_REGEX)
+      raise ArgumentError, "Invalid version (build must be nil, or a string following http://semver.org contraints)"
+    end
   end
 end
 

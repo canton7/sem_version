@@ -23,7 +23,26 @@ v.to_s          # => '1.2.3-pre.4+build.5'
 ```
 
 You can pass any valid semantic version string, as specified by [Semantic Versions](http://semver.org).
-Invalid versions will raise an ArgumentError
+Invalid versions will raise an ArgumentError.
+
+You can also create a new SemVersion from an array or a hash, and serialise back to arrays and hashes.
+
+```ruby
+v1 = SemVersion.new([1, 2, 3, 'pre.4', 'build.5'])
+v1.to_s          # => '1.2.3-pre.4+build.5'
+v1.to_a          # => [1, 2, 3, 'pre.4', 'build.5']
+
+v2 = SemVersion.new(1, 2, 3, nil, 'build.5')
+v2.to_s          # => '1.2.3+build.5'
+v2.to_a          # => [1, 2, 3, nil, 'build.5']
+
+v3 = SemVersion.new(:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5')
+v.to_s           # => '1.2.3-pre.4+build.5'
+v.to_h           # => {:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5'}
+
+v4 = SemVersion.new(:major => 1, :minor => 2, :patch => 3, :build = 'build.6')
+v4.to_h          # => {:major => 1, :minor => 2, :patch => 3, :build => 'build.6'}
+```
 
 You can also use `SemVersion()` as an alias for `SemVersion.new()`.
 
