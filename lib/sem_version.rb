@@ -1,7 +1,8 @@
 class SemVersion
   include Comparable
 
-  VERSION = '1.2.0'
+  VERSION = '1.3.0'
+
   # Pattern allows min and patch to be skipped. We have to do extra checking if we want them
   SEMVER_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?)?)?$/
   PRE_BUILD_REGEX = /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
