@@ -23,9 +23,29 @@ v.to_s          # => '1.2.3-pre.4+build.5'
 ```
 
 You can pass any valid semantic version string, as specified by [Semantic Versions](http://semver.org).
-Invalid versions will raise an ArgumentError
+Invalid versions will raise an ArgumentError.
+
+You can also create a new SemVersion from an array or a hash, and serialise back to arrays and hashes.
+
+```ruby
+v1 = SemVersion.new([1, 2, 3, 'pre.4', 'build.5'])
+v1.to_s          # => '1.2.3-pre.4+build.5'
+v1.to_a          # => [1, 2, 3, 'pre.4', 'build.5']
+
+v2 = SemVersion.new(1, 2, 3, nil, 'build.5')
+v2.to_s          # => '1.2.3+build.5'
+v2.to_a          # => [1, 2, 3, nil, 'build.5']
+
+v3 = SemVersion.new(:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5')
+v.to_s           # => '1.2.3-pre.4+build.5'
+v.to_h           # => {:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5'}
+
+v4 = SemVersion.new(:major => 1, :minor => 2, :patch => 3, :build => 'build.6')
+v4.to_h          # => {:major => 1, :minor => 2, :patch => 3, :build => 'build.6'}
+```
 
 You can also use `SemVersion()` as an alias for `SemVersion.new()`.
+
 
 Validating
 ----------
@@ -81,7 +101,7 @@ Constraints are in the form `"<comparison> <version>"`, e.g. ">= 1.2.2", "= 1.3"
 
 When using the pessimistic operation, `~>`, versions may be specified in the form `"x.y"` or `"x.y.z"` (with `"~> x.y"` meaning `">= x.y.0" && "< x+1.0.0"`, and `"~> x.y.z"` meaning `">= x.y.z" && "< x.y+1.0"`).
 
-When using the other operations, versions may be in the form `"x"`, `"x.y"`, or a full semantic version (including pre-release and build).
+When using the other operations, versions may be in the form `"x"`, `"x.y"`, or a full semantic version (including optional pre-release and build).
 In the former two cases, the missing versions out of minor and patch will be filled in with 0's, and the pre-release and build ignored.
 
 ```ruby
@@ -104,11 +124,23 @@ SemVersion.open_constraint?('~> 1.2.3')   # => true
 ```
 
 It's also possible to split a constraint into its comparison and version.
-The comparsion is normalised to '=' if it's not given, or '=='.
+If the comparison is not given, or is '==', it is normalised to '='.
 
 ```ruby
 SemVersion.split_constraint('1.2.3')     # => ['=', '1.2.3']
 SemVersion.split_constraint('= 1.2.3')   # => ['=', '1.2.3']
 SemVersion.split_constraint('== 1.2.3')  # => ['=', '1.2.3']
 SemVersion.split_constraint('> 1.2.3')   # => ['>', '1.2.3']
+```
+
+Core Extensions
+===============
+
+You can also load a set of core extensions using an optional require.
+
+```ruby
+require 'sem_version'
+require 'sem_version/core_ext'
+
+"1.2.3+pre.4-build.5".to_version
 ```
