@@ -143,3 +143,15 @@ SemVersion.split_constraint('= 1.2.3')   # => ['=', '1.2.3']
 SemVersion.split_constraint('== 1.2.3')  # => ['=', '1.2.3']
 SemVersion.split_constraint('> 1.2.3')   # => ['>', '1.2.3']
 ```
+
+Core Extensions
+===============
+
+You can also load a set of core extensions using an optional require.
+
+```ruby
+require 'sem_version'
+require 'sem_version/core_ext'
+
+"1.2.3+pre.4-build.5".to_version
+```
