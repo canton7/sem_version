@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.name = 'sem_version'
   s.version = SemVersion::VERSION
   s.summary = 'SemVersion: Semantic version parsing and comparison. See http://semver.org/'
-  s.description = 'Allows you to parse and compare semantic versions, as specified by http://semver.org/. Allows constraint checking e.g. >=, <, ~>'
+  s.description = 'Semantic Version parsing, comparison, and constraint checking utility, as specified by http://semver.org/'
   s.homepage = 'https://github.com/canton7/sem_version'
   s.platform = Gem::Platform::RUBY
   s.authors = ['Antony Male']
