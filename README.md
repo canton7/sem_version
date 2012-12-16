@@ -27,6 +27,18 @@ Invalid versions will raise an ArgumentError
 
 You can also use `SemVersion()` as an alias for `SemVersion.new()`.
 
+Serialising
+-----------
+
+As well as `#to_s`, SemVersion provides the methods `#to_a` and `#to_h`.
+
+```ruby
+v = SemVersion.new('1.2.3-pre.4+build.5')
+v.to_s          # => '1.2.3-pre.4+build.5'
+v.to_a          # => [1, 2, 3, 'pre.4', 'build.5']
+v.to_h          # => {:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5'}
+```
+
 Validating
 ----------
 

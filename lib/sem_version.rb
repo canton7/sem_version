@@ -128,12 +128,19 @@ class SemVersion
     @build = val
   end
 
-
   def to_s
-    r = "#{@major}.#{@minor}.#{patch}"
+    r = "#{@major}.#{@minor}.#{@patch}"
     r << "-#{@pre}" if @pre
     r << "+#{@build}" if @build
     r
+  end
+
+  def to_a
+    [@major, @minor, @patch, @pre, @build]
+  end
+
+  def to_h
+    Hash[[:major, :minor, :patch, :pre, :build].zip(to_a)]
   end
 
   private

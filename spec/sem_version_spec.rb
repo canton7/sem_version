@@ -42,6 +42,14 @@ describe "SemVersion" do
     end
   end
 
+  it "should correctly generate version arrays using #to_s" do 
+    SemVersion.new('1.2.3-pre.4+build.5').to_a.should == [1, 2, 3, 'pre.4', 'build.5']
+  end
+
+  it "should correctly generate hashes using #to_h" do 
+    SemVersion.new('1.2.3-pre.4+build.5').to_h.should == {:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5'}
+  end
+
   context "when comparing versions" do 
     it "should compare patch correctly" do 
       SemVersion.new('0.0.1').should be == SemVersion.new('0.0.1')
