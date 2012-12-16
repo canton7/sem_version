@@ -151,6 +151,10 @@ class SemVersion
     Hash[h.reject{ |k,v| v.nil? }]
   end
 
+  def inspect
+    "#<SemVersion: #{to_s}>"
+  end
+
   private
 
   def compare_sep(ours, theirs, nil_wins)
