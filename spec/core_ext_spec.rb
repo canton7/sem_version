@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'sem_version/core_ext'
 
 describe "SemVersion core exts" do

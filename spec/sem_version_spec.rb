@@ -1,6 +1,7 @@
+require 'spec_helper'
 require 'sem_version'
 
-describe "SemVersion" do
+describe SemVersion do
   context "when parsing a version from string" do
     it "should correctly identify major, minor, build" do
       v = SemVersion.new('0.1.2')
