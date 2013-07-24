@@ -1,31 +1,31 @@
 class SemVersion
   include Comparable
 
-  VERSION = '1.3.0'
+  VERSION = '2.0.0'
 
   # Pattern allows min and patch to be skipped. We have to do extra checking if we want them
   SEMVER_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+)(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?)?)?$/
-  PRE_BUILD_REGEX = /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
+  PRE_METADATA_REGEX = /^[\dA-Za-z\-]+(\.[\dA-Za-z\-]+)*$/
 
-  attr_reader :major, :minor, :patch, :pre, :build
+  attr_reader :major, :minor, :patch, :pre, :metadata
   alias_method :prerelease, :pre
 
   # Format were raw bits are passed in is undocumented, and not validity checked
   def initialize(*args)
     if args.first.is_a?(String)
-      @major, @minor, @patch, @pre, @build = self.class.parse(args.first)
+      @major, @minor, @patch, @pre, @metadata = self.class.parse(args.first)
       # Validation should be handled at a string level by self.parse, but validate anyway
       validate
     elsif args.first.is_a?(Hash)
-      @major, @minor, @patch, @pre, @build = args.first.values_at(:major, :minor, :patch, :pre, :build)
+      @major, @minor, @patch, @pre, @metadata = args.first.values_at(:major, :minor, :patch, :pre, :metadata)
       # Allow :prerelease as well
       @pre ||= args.first[:prerelease]
       validate
     elsif args.first.is_a?(Array)
-      @major, @minor, @patch, @pre, @build = *args.first
+      @major, @minor, @patch, @pre, @metadata = *args.first
       validate
     else
-      @major, @minor, @patch, @pre, @build = *args
+      @major, @minor, @patch, @pre, @metadata = *args
       validate
     end
   end
@@ -65,10 +65,7 @@ class SemVersion
     pre = compare_sep(@pre, other.pre, true)
     return pre unless pre == 0
 
-    bui = compare_sep(@build, other.build, false)
-    return bui unless bui == 0
-
-    0
+    return 0
   end
 
   def satisfies?(constraint)
@@ -122,33 +119,33 @@ class SemVersion
   end
 
   def pre=(val)
-    unless val.nil? || (val.is_a?(String) && val =~ PRE_BUILD_REGEX)
+    unless val.nil? || (val.is_a?(String) && val =~ PRE_METADATA_REGEX)
       raise ArgumentError, "#{val} is not a valid pre-release version (must be nil, or a string following http://semver.org constraints)"
     end
     @pre = val
   end
   alias_method :prerelease=, :pre=
 
-  def build=(val)
-    unless val.nil? || (val.is_a?(String) && val =~ PRE_BUILD_REGEX)
-      raise ArgumentError, "#{val} is not a valid build version (must be nil, or a string following http://semver.org constraints)"
+  def metadata=(val)
+    unless val.nil? || (val.is_a?(String) && val =~ PRE_METADATA_REGEX)
+      raise ArgumentError, "#{val} is not a valid metadata string (must be nil, or a string following http://semver.org constraints)"
     end
-    @build = val
+    @metadata = val
   end
 
   def to_s
     r = "#{@major}.#{@minor}.#{@patch}"
     r << "-#{@pre}" if @pre
-    r << "+#{@build}" if @build
+    r << "+#{@metadata}" if @metadata
     r
   end
 
   def to_a
-    [@major, @minor, @patch, @pre, @build]
+    [@major, @minor, @patch, @pre, @metadata]
   end
 
   def to_h
-    h = [:major, :minor, :patch, :pre, :build].zip(to_a)
+    h = [:major, :minor, :patch, :pre, :metadata].zip(to_a)
     Hash[h.reject{ |k,v| v.nil? }]
   end
 
@@ -188,11 +185,11 @@ class SemVersion
     raise ArgumentError, "Invalid version (major is not an int >= 0)" unless @major.is_a?(Fixnum) && @major >= 0
     raise ArgumentError, "Invalid version (minor is not an int >= 0)" unless @minor.is_a?(Fixnum) && @minor >= 0
     raise ArgumentError, "Invalid version (patch is not an int >= 0)" unless @patch.is_a?(Fixnum) && @patch >= 0
-    unless @pre.nil? || (@pre.is_a?(String) && @pre =~ PRE_BUILD_REGEX)
+    unless @pre.nil? || (@pre.is_a?(String) && @pre =~ PRE_METADATA_REGEX)
       raise ArgumentError, "Invalid version (pre must be nil, or a string following http://semver.org contraints)"
     end
-    unless @build.nil? || (@build.is_a?(String) && @build =~ PRE_BUILD_REGEX)
-      raise ArgumentError, "Invalid version (build must be nil, or a string following http://semver.org contraints)"
+    unless @metadata.nil? || (@metadata.is_a?(String) && @metadata =~ PRE_METADATA_REGEX)
+      raise ArgumentError, "Invalid version (metadata must be nil, or a string following http://semver.org contraints)"
     end
   end
 end

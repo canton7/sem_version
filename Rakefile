@@ -1,4 +1,7 @@
+require 'rake/clean'
 require 'rspec/core/rake_task'
+
+CLEAN.include '*.gem'
 
 spec = eval(File.read(Dir["*.gemspec"].first))
 
