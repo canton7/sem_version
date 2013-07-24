@@ -3,7 +3,7 @@ require 'sem_version'
 
 describe SemVersion do
   context "when parsing a version from string" do
-    it "should correctly identify major, minor, build" do
+    it "should correctly identify major, minor, patch" do
       v = SemVersion.new('0.1.2')
       v.major.should == 0
       v.minor.should == 1
@@ -16,12 +16,12 @@ describe SemVersion do
       v.prerelease.should == 'three.4-5'
     end
 
-    it "should correctly identify the build" do
-      v1 = SemVersion.new('0.1.2+build.4.5')
+    it "should correctly identify the metadata" do
+      v1 = SemVersion.new('0.1.2+metadata.4.5')
       v2 = SemVersion.new('0.1.2-pre.four+five.6')
 
-      v1.build.should == 'build.4.5'
-      v2.build.should == 'five.6'
+      v1.metadata.should == 'metadata.4.5'
+      v2.metadata.should == 'five.6'
     end
   end
 
@@ -34,27 +34,27 @@ describe SemVersion do
       SemVersion.new('3.2.1-pre.4').to_s.should == '3.2.1-pre.4'
     end
 
-    it "should do x.y.z+build" do
-      SemVersion.new('1.2.3+build.4.five').to_s.should == '1.2.3+build.4.five'
+    it "should do x.y.z+metadata" do
+      SemVersion.new('1.2.3+metadata.4.five').to_s.should == '1.2.3+metadata.4.five'
     end
 
-    it "should do x.y.z-pre+build" do
-      SemVersion.new('3.2.1-pre.4+build.5.six').to_s.should == '3.2.1-pre.4+build.5.six'
+    it "should do x.y.z-pre+metadata" do
+      SemVersion.new('3.2.1-pre.4+metadata.5.six').to_s.should == '3.2.1-pre.4+metadata.5.six'
     end
   end
 
   it "should correctly generate version arrays using #to_s" do
-    SemVersion.new('1.2.3-pre.4+build.5').to_a.should == [1, 2, 3, 'pre.4', 'build.5']
+    SemVersion.new('1.2.3-pre.4+metadata.5').to_a.should == [1, 2, 3, 'pre.4', 'metadata.5']
   end
 
   context "when generating hashes using #to_h" do
     it "should correctly generate hashes" do
-      SemVersion.new('1.2.3-pre.4+build.5').to_h.should == {:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :build => 'build.5'}
+      SemVersion.new('1.2.3-pre.4+metadata.5').to_h.should == {:major => 1, :minor => 2, :patch => 3, :pre => 'pre.4', :metadata => 'metadata.5'}
     end
 
-    it "should skip nil pre or build keys" do
+    it "should skip nil pre or metadata keys" do
       SemVersion.new('1.2.3').to_h.has_key?(:pre).should be_false
-      SemVersion.new('1.2.3').to_h.has_key?(:build).should be_false
+      SemVersion.new('1.2.3').to_h.has_key?(:metadata).should be_false
     end
   end
 
@@ -90,31 +90,20 @@ describe SemVersion do
       SemVersion.new('1.0.0-a.3').should be < SemVersion.new('1.0.0-a.3.3')
     end
 
-    it "should compare build correctly" do
-      SemVersion.new('1.0.0-pre+build').should be == SemVersion.new('1.0.0-pre+build')
-      SemVersion.new('1.0.0+build').should be == SemVersion.new('1.0.0+build')
-      SemVersion.new('1.0.0+build').should be > SemVersion.new('1.0.0')
-      SemVersion.new('1.0.0+alpha').should be < SemVersion.new('1.0.0+beta')
-      SemVersion.new('1.0.0+1').should be < SemVersion.new('1.0.0+2')
-      SemVersion.new('1.0.0+2').should be < SemVersion.new('1.0.0+11')
-      SemVersion.new('1.0.0+a').should be > SemVersion.new('1.0.0+100')
-      SemVersion.new('1.0.0+a.3.b').should be < SemVersion.new('1.0.0+a.3.c')
-      SemVersion.new('1.0.0+a.4.b').should be > SemVersion.new('1.0.0+a.3.c')
-      SemVersion.new('1.0.0+a.3.b').should be > SemVersion.new('1.0.0+a.3')
-      SemVersion.new('1.0.0+a.3').should be < SemVersion.new('1.0.0+a.3.3')
+    it "should compare metadata correctly" do
+      SemVersion.new('1.0.0-pre+metadata').should be == SemVersion.new('1.0.0-pre+metadata')
+      SemVersion.new('1.0.0+metadata').should be == SemVersion.new('1.0.0+metadata')
+      SemVersion.new('1.0.0+metadata').should be == SemVersion.new('1.0.0')
     end
 
     it "should pass the semver.org test cases" do
       SemVersion.new('1.0.0-alpha').should be < SemVersion.new('1.0.0-alpha.1')
-      SemVersion.new('1.0.0-alpha.1').should be < SemVersion.new('1.0.0-beta.2')
+      SemVersion.new('1.0.0-alpha.1').should be < SemVersion.new('1.0.0-alpha.beta')
+      SemVersion.new('1.0.0-alpha.beta').should be < SemVersion.new('1.0.0-beta')
+      SemVersion.new('1.0.0-beta').should be < SemVersion.new('1.0.0-beta.2')
       SemVersion.new('1.0.0-beta.2').should be < SemVersion.new('1.0.0-beta.11')
       SemVersion.new('1.0.0-beta.11').should be < SemVersion.new('1.0.0-rc.1')
-      SemVersion.new('1.0.0-rc.1').should be < SemVersion.new('1.0.0-rc.1+build.1')
-      SemVersion.new('1.0.0-rc.1+build.1').should be < SemVersion.new('1.0.0')
-      SemVersion.new('1.0.0').should be < SemVersion.new('1.0.0+0.3.7')
-      SemVersion.new('1.0.0+0.3.7').should be < SemVersion.new('1.3.7+build')
-      SemVersion.new('1.3.7+build').should be < SemVersion.new('1.3.7+build.2.b8f12d7')
-      SemVersion.new('1.3.7+build.2.b8f12d7').should be < SemVersion.new('1.3.7+build.11.e0f985a')
+      SemVersion.new('1.0.0-rc.1').should be < SemVersion.new('1.0.0')
     end
   end
 
@@ -233,20 +222,20 @@ describe SemVersion do
       expect{ v.pre = 'a.!' }.to raise_error(ArgumentError)
     end
 
-    it "should modify build correctly" do
+    it "should modify metadata correctly" do
       v = SemVersion.new('1.2.3-four.5')
-      v.build = 'five.6'
-      v.build.should == 'five.6'
-      v.build = nil
-      v.build.should == nil
+      v.metadata = 'five.6'
+      v.metadata.should == 'five.6'
+      v.metadata = nil
+      v.metadata.should == nil
     end
 
-    it "should complain if build is invalid" do
+    it "should complain if metadata is invalid" do
       v = SemVersion.new('1.2.3-four.5')
-      expect{ v.build = 1 }.to raise_error(ArgumentError)
-      expect{ v.build = 'a.' }.to raise_error(ArgumentError)
-      expect{ v.build = '.a' }.to raise_error(ArgumentError)
-      expect{ v.build = 'a.!' }.to raise_error(ArgumentError)
+      expect{ v.metadata = 1 }.to raise_error(ArgumentError)
+      expect{ v.metadata = 'a.' }.to raise_error(ArgumentError)
+      expect{ v.metadata = '.a' }.to raise_error(ArgumentError)
+      expect{ v.metadata = 'a.!' }.to raise_error(ArgumentError)
     end
   end
 
@@ -274,10 +263,10 @@ describe SemVersion do
 
   context "when parsing a version from array" do
     it "should correctly identify sections" do
-      v = SemVersion.new([3, 4, 5, 'pre.4', 'build.5'])
-      v.to_s.should == '3.4.5-pre.4+build.5'
-      v2 = SemVersion.new(3, 4, 5, 'pre.4', 'build.5')
-      v.to_s.should == '3.4.5-pre.4+build.5'
+      v = SemVersion.new([3, 4, 5, 'pre.4', 'metadata.5'])
+      v.to_s.should == '3.4.5-pre.4+metadata.5'
+      v2 = SemVersion.new(3, 4, 5, 'pre.4', 'metadata.5')
+      v.to_s.should == '3.4.5-pre.4+metadata.5'
     end
 
     it "should moan if any parts are invalid" do
@@ -285,19 +274,19 @@ describe SemVersion do
       expect{ SemVersion.new(3, 4) }.to raise_error(ArgumentError)
       expect{ SemVersion.new(-1, 4, 5) }.to raise_error(ArgumentError)
       expect{ SemVersion.new(3, 4, 5, 'pre!') }.to raise_error(ArgumentError)
-      expect{ SemVersion.new(3, 4, 5, nil, 'build.4') }.not_to raise_error
+      expect{ SemVersion.new(3, 4, 5, nil, 'metadata.4') }.not_to raise_error
     end
   end
 
   context "when parsing a version from a hash" do
     it "should correctly identify sections" do
-      v = SemVersion.new(:major => 3, :minor => 2, :patch => 1, :pre => 'pre.4', :build => 'build.5')
-      v.to_s.should == '3.2.1-pre.4+build.5'
+      v = SemVersion.new(:major => 3, :minor => 2, :patch => 1, :pre => 'pre.4', :metadata => 'metadata.5')
+      v.to_s.should == '3.2.1-pre.4+metadata.5'
     end
 
     it "should allow :prerelease as well as :pre" do
-      v = SemVersion.new(:major => 3, :minor => 2, :patch => 1, :prerelease => 'pre.4', :build => 'build.5')
-      v.to_s.should == '3.2.1-pre.4+build.5'
+      v = SemVersion.new(:major => 3, :minor => 2, :patch => 1, :prerelease => 'pre.4', :metadata => 'metadata.5')
+      v.to_s.should == '3.2.1-pre.4+metadata.5'
     end
   end
 end
