@@ -104,17 +104,17 @@ class SemVersion
   end
 
   def major=(val)
-    raise ArgumentError, "#{val} is not a valid major version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
+    raise ArgumentError, "#{val} is not a valid major version (must be an integer >= 0)" unless val.is_a?(Integer) && val >= 0
     @major = val
   end
 
   def minor=(val)
-    raise ArgumentError, "#{val} is not a valid minor version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
+    raise ArgumentError, "#{val} is not a valid minor version (must be an integer >= 0)" unless val.is_a?(Integer) && val >= 0
     @minor = val
   end
 
   def patch=(val)
-    raise ArgumentError, "#{val} is not a valid patch version (must be an integer >= 0)" unless val.is_a?(Fixnum) && val >= 0
+    raise ArgumentError, "#{val} is not a valid patch version (must be an integer >= 0)" unless val.is_a?(Integer) && val >= 0
     @patch = val
   end
 
@@ -182,9 +182,9 @@ class SemVersion
 
   def validate
     # Validates the instance variables. Different approach to validating a raw string
-    raise ArgumentError, "Invalid version (major is not an int >= 0)" unless @major.is_a?(Fixnum) && @major >= 0
-    raise ArgumentError, "Invalid version (minor is not an int >= 0)" unless @minor.is_a?(Fixnum) && @minor >= 0
-    raise ArgumentError, "Invalid version (patch is not an int >= 0)" unless @patch.is_a?(Fixnum) && @patch >= 0
+    raise ArgumentError, "Invalid version (major is not an int >= 0)" unless @major.is_a?(Integer) && @major >= 0
+    raise ArgumentError, "Invalid version (minor is not an int >= 0)" unless @minor.is_a?(Integer) && @minor >= 0
+    raise ArgumentError, "Invalid version (patch is not an int >= 0)" unless @patch.is_a?(Integer) && @patch >= 0
     unless @pre.nil? || (@pre.is_a?(String) && @pre =~ PRE_METADATA_REGEX)
       raise ArgumentError, "Invalid version (pre must be nil, or a string following http://semver.org contraints)"
     end
